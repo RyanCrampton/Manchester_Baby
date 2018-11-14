@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+int [32][32] array;
+
+
 /*
 char **loadFile() {
   printf("Please enter in the file name to be loaded\n");
@@ -63,9 +67,25 @@ char **loadFile() {
   return boardToLoad;
 }
 */
-decode()
+int decodeNum(char decode[8], int x)
 {
-
+	if (x == 1)
+	{
+		int num;
+		int[5] pass;
+		for(int i = 0;i < 5; i++)
+		{
+			pass[i] = decode[i];
+		}
+		while (num > 0)
+		{
+			rem = num % 10;
+			decimal_val = decimal_val + rem * base;
+			num = num / 10 ;
+			base = base * 2;
+		}
+	}
+	
 }
 int incriment()
 {
@@ -121,7 +141,11 @@ int execute(int instruction, int line)
 }
 int display_everything()
 {
+	for(int i = 0; i < 32; i++)
+	{
+		printf(array[i][j]);
 
+	}
 }
 int JMP()
 {
