@@ -96,6 +96,50 @@ void STP()
 	printf("stopping");
 	stopped = 0;
 }
+void execute(int instruction[3], int line[5])
+{
+	int check[3] = {0,0,0};
+	int check1[3] = {1,0,0};
+	int check2[3]  = {0,1,0};
+	int check3[3]  = {1,1,0};
+	int check4[3]  = {0,0,1};
+	int check5[3]  = {1,0,1};
+	int check6[3]  = {0,1,1};
+	int check7[3] = {1,1,1};
+
+	if(instruction == check)
+	{
+		JMP();
+	}
+	else if(instruction == check1)
+	{
+		JRP();
+	}
+	else if(instruction == check2)
+	{
+		LDN();
+	}
+	else if(instruction == check3)
+	{
+		STO();
+	}
+	else if(instruction == check4)
+	{
+		SUB();
+	}
+	else if(instruction == check5)
+	{
+		SUB();
+	}
+	else if(instruction == check6)
+	{
+		CMP();
+	}
+	else if(instruction == check7)
+	{
+		STP();
+	}
+}
 void incriment()
 {
 	//loadFile();
@@ -126,46 +170,12 @@ void decode()
 	}
 	execute(opCode, operand);
 }
-void execute(int instruction[3], int line[5])
-{
-	if(instruction == {0,0,0})
-	{
-		JMP();
-	}
-	else if(instruction == {1,0,0})
-	{
-		JRP();
-	}
-	else if(instruction == {0,1,0})
-	{
-		LDN();
-	}
-	else if(instruction == {1,1,0})
-	{
-		STO();
-	}
-	else if(instruction == {0,0,1})
-	{
-		SUB();
-	}
-	else if(instruction == {1,0,1})
-	{
-		SUB();
-	}
-	else if(instruction == {0,1,1})
-	{
-		CMP();
-	}
-	else if(instruction == {1,1,1})
-	{
-		STP();
-	}
-}
+
 int display_everything()
 {
 	for(int i = 0; i < 32; i++)
 	{
-		printf(array[i]);
+		printf("test");
 	}
 	return 1;
 }
@@ -182,5 +192,6 @@ int main()
 	}
 	display_everything();
 	*/
+	decode();
 	return 1;
 }
