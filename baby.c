@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int [32][32] array;
-
+int array[32] = {0,0,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int stopped = 1;
 
 /*
 char **loadFile() {
@@ -67,74 +67,96 @@ char **loadFile() {
   return boardToLoad;
 }
 */
-int decodeNum(char decode[8], int x)
+void JMP()
 {
-	if (x == 1)
+	printf("JMP");
+}
+void JRP()
+{
+	printf("JRP");
+}
+void LDN()
+{
+	printf("LDN");
+}
+void STO()
+{
+	printf("STO");
+}
+void SUB()
+{
+	printf("SUB");
+}
+void CMP()
+{
+	printf("CMP");
+}
+void STP()
+{
+	printf("stopping");
+	stopped = 0;
+}
+void incriment()
+{
+	//loadFile();
+	
+}
+void fetch()
+{
+	int address[5];
+}
+void decode()
+{
+	int opCode[3];
+	int operand[5];
+  	int instruction[32]; 
+  	for(int i = 0; i < 32; i++)
+  	{
+  		instruction[i] = array[i];
+  	}
+	for(int i = 0; i <= 4; i++)
 	{
-		int num;
-		int[5] pass;
-		for(int i = 0;i < 5; i++)
-		{
-			pass[i] = decode[i];
-		}
-		while (num > 0)
-		{
-			rem = num % 10;
-			decimal_val = decimal_val + rem * base;
-			num = num / 10 ;
-			base = base * 2;
-		}
+    	//extract bits one through five from the instruction and insert them into the operand
+    	operand[i] = instruction[i];
 	}
-	
+	int lineCode[5];
+	for(int i = 13; i<16; i++)
+	{
+		lineCode[i-13] = instruction[i];
+	}
+	execute(opCode, operand);
 }
-int incriment()
+void execute(int instruction[3], int line[5])
 {
-	loadFile();
-	
-}
-int fetch()
-{
-
-}
-int decode()
-{
-	int instruction;
-	int line;
-
-
-	execute(instruction, line)
-}
-int execute(int instruction, int line)
-{
-	if(instruction == 0)
+	if(instruction == {0,0,0})
 	{
 		JMP();
 	}
-	else if(instruction == 1)
+	else if(instruction == {1,0,0})
 	{
 		JRP();
 	}
-	else if(instruction == 2)
+	else if(instruction == {0,1,0})
 	{
 		LDN();
 	}
-	else if(instruction == 3)
+	else if(instruction == {1,1,0})
 	{
 		STO();
 	}
-	else if(instruction == 4)
+	else if(instruction == {0,0,1})
 	{
 		SUB();
 	}
-	else if(instruction == 5)
+	else if(instruction == {1,0,1})
 	{
 		SUB();
 	}
-	else if(instruction == 6)
+	else if(instruction == {0,1,1})
 	{
 		CMP();
 	}
-	else if(instruction == 7)
+	else if(instruction == {1,1,1})
 	{
 		STP();
 	}
@@ -143,42 +165,15 @@ int display_everything()
 {
 	for(int i = 0; i < 32; i++)
 	{
-		printf(array[i][j]);
-
+		printf(array[i]);
 	}
-}
-int JMP()
-{
-
-}
-int JRP()
-{
-
-}
-int LDN()
-{
-
-}
-int STO()
-{
-
-}
-int SUB()
-{
-
-}
-int CMP()
-{
-
-}
-int STP()
-{
-	stopped = true;
+	return 1;
 }
 int main()
 {
-	bool stopped = false;
-	while(stopped == false)
+	/*
+	
+	while(stopped == 1)
 	{
 		incriment();
 		fetch();
@@ -186,4 +181,6 @@ int main()
 		execute();
 	}
 	display_everything();
+	*/
+	return 1;
 }
