@@ -11,7 +11,6 @@ enum Operands {JMPCODE, JRPCODE, LDNCODE, STOCODE, SUBCODE, SUB2CODE, CMPCODE, S
 int **loadFile() {
 	/*
   printf("Please enter in the file name to be loaded\n");
-
 	  //buffer holds the input from getLine
 	  char *buffer;
 	  buffer = (char *)malloc(32 * sizeof(char));
@@ -90,10 +89,8 @@ int **loadFile() {
 /* The following function takes in an integer array of 1's and 0's and converts
 the array into its Integer equivalent. It uses the powers of 2 for each 'bit'
 in the array to multiply it out then increments the current power of two.
-
 @size - The size argument is how many elements are in the array passed in (usually 32)
 @arrayToConvert - The arrayToConvert argument is the array to be converted to a Integer
-
 @return - returns the respective integer that is the result of the arrayToConvert
 */
 int binaryToDecimal(int size, int arrayToConvert[]) {
@@ -109,9 +106,15 @@ int binaryToDecimal(int size, int arrayToConvert[]) {
 	 return decimal;
 }
 
-void JMP()
+void JMP(int line[5])
 {
+	int lineToFill = binaryToDecimal(5, line)
 	printf("JMP");
+	for(int i = 0; i < lineToFill; i++)
+	{
+		i++
+	}
+	currentFile[lineToFill][lineToFill];
 }
 void JRP()
 {
@@ -142,10 +145,8 @@ void STP()
 /*
 This function takes in an array and compares it to the various legal operations
 then returns a number based on which opCode matches
-
 @instruction - the current instruction sent it, to be calculated what number it
 relates to
-
 @return - A number from 0-7 based on the relevant opCodes
 */
 int getOpcode(int instruction[3]) {
@@ -187,7 +188,7 @@ void execute(int instruction[3], int line[5])
 
 	if(opCode == JMPCODE)
 	{
-		JMP();
+		JMP(line);
 	}
 	else if(opCode == JRPCODE)
 	{
@@ -277,17 +278,50 @@ void decode()
 
 int display_everything()
 {
-	for(int i = 0; i < 32; i++)
+	/*
+	printf("Please enter a file name", );
+	for(int j = 0; j < 32; j++)
 	{
-		printf("test");
+		for(int i = 0; i < 32; i++)
+		{
+			printf("%d", ACCUMULATOR[i]);
+		}
+		j++;
 	}
+	*/
+	/*
+	FILE *fptr; 
+  
+    char filename[100], c; 
+  
+    filename = "binary.txt";
+  
+    // Open file 
+    fptr = fopen(filename, "r"); 
+    if (fptr == NULL) 
+    { 
+        printf("Cannot open file \n"); 
+        exit(0); 
+    } 
+  
+    // Read contents from file 
+    c = fgetc(fptr); 
+    while (c != EOF) 
+    { 
+        printf ("%c", c); 
+        c = fgetc(fptr); 
+    } 
+  
+    fclose(fptr); 
 	return 1;
+	*/
 }
 int main()
 {
 
 
 	//testing the loadfile function
+	/*
 	int **currentFile = loadFile();
 
 	for (size_t i = 0; i < 10; i++) {
@@ -296,10 +330,9 @@ int main()
 		}
 		printf("\n");
 	}
-
+	*/
 
 	/*
-
 	while(stopped == 1)
 	{
 		incriment();
