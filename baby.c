@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int ACCUMULATOR[32] = {0,0,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 //set CI to point to the default line 0
@@ -106,15 +107,45 @@ int binaryToDecimal(int size, int arrayToConvert[]) {
 	 return decimal;
 }
 
+
+int *decimalToBinary(int size, int numToConvert) {
+
+	int *binary;
+	binary = malloc(sizeof(int) * size);
+	int k;
+
+	for (int i = size-1; i >= 0; i--) {
+
+		k = numToConvert >> i;
+
+		if (k & 1) {
+			binary[i] = 1;
+		} else {
+			binary[i] = 0;
+		}
+	}
+
+	int *flippedBinary;
+	flippedBinary = malloc(sizeof(int) * size);
+
+	int c, d;
+
+	for (c = size - 1, d = 0; c >= 0; c--, d++)
+	 flippedBinary[d] = binary[c];
+
+	return flippedBinary;
+}
+
+
 void JMP(int line[5])
 {
-	int lineToFill = binaryToDecimal(5, line)
+	int lineToFill = binaryToDecimal(5, line);
 	printf("JMP");
 	for(int i = 0; i < lineToFill; i++)
 	{
-		i++
+		i++;
 	}
-	currentFile[lineToFill][lineToFill];
+	//currentFile[lineToFill][lineToFill];
 }
 void JRP()
 {
@@ -290,34 +321,47 @@ int display_everything()
 	}
 	*/
 	/*
-	FILE *fptr; 
-  
-    char filename[100], c; 
-  
+	FILE *fptr;
+
+    char filename[100], c;
+
     filename = "binary.txt";
-  
-    // Open file 
-    fptr = fopen(filename, "r"); 
-    if (fptr == NULL) 
-    { 
-        printf("Cannot open file \n"); 
-        exit(0); 
-    } 
-  
-    // Read contents from file 
-    c = fgetc(fptr); 
-    while (c != EOF) 
-    { 
-        printf ("%c", c); 
-        c = fgetc(fptr); 
-    } 
-  
-    fclose(fptr); 
+
+    // Open file
+    fptr = fopen(filename, "r");
+    if (fptr == NULL)
+    {
+        printf("Cannot open file \n");
+        exit(0);
+    }
+
+    // Read contents from file
+    c = fgetc(fptr);
+    while (c != EOF)
+    {
+        printf ("%c", c);
+        c = fgetc(fptr);
+    }
+
+    fclose(fptr);
 	return 1;
 	*/
 }
 int main()
 {
+
+	int num = 7;
+
+	int *bin;
+	bin = decimalToBinary(32, num);
+
+	for (size_t i = 0; i < 32; i++) {
+		printf("%d", bin[i]);
+	}
+
+	printf("\n%d\n", binaryToDecimal(32, bin));
+
+
 
 
 	//testing the loadfile function
