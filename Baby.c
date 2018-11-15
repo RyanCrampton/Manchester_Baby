@@ -153,7 +153,11 @@ int *decimalToBinary(int size, int numToConvert)
 void JMP()
 {
 	printf("JMP");
-	CI = Store;
+	for (int i = 0;i < 32; i++)
+	{
+		CI[i] = Store[i];
+	}
+	
 }
 /*
 	This adds the content of the store location to the CI
@@ -161,6 +165,12 @@ void JMP()
 void JRP()
 {
 	printf("JRP");
+	/*
+		binaryToDecimal(CI);
+		binaryToDecimal(Store);
+		CI = CI + Store;
+		decimalToBinary(CI);
+	*/
 }
 /*
 	This gives the negative alternative of the content in the store and loads that in
@@ -324,7 +334,6 @@ void fetch(int **currentFile)
 */
 void decode()
 {
-	int opCode[3];
 	int operand[5];
   	int instruction[32];
   	for(int i = 0; i < 32; i++)
@@ -349,25 +358,27 @@ void decode()
 */
 int display_everything()
 {
-	
-	FILE *fptr;
-    char filename[100], c;
-    filename = "binary.txt";
-    // Open file
-    fptr = fopen(filename, "r");
-    if (fptr == NULL)
-    {
-        printf("Cannot open file \n");
-        exit(0);
-    }
-    // Read contents from file
-    c = fgetc(fptr);
-    while (c != EOF)
-    {
-        printf ("%c", c);
-        c = fgetc(fptr);
-    }
-    fclose(fptr);
+	//Think im calling something wrong, couldnt figure it out
+	/*
+		FILE *fptr;
+	    char filename[100], c;
+	    filename = "binary.txt";
+	    // Open file
+	    fptr = fopen(filename, "r");
+	    if (fptr == NULL)
+	    {
+	        printf("Cannot open file \n");
+	        exit(0);
+	    }
+	    // Read contents from file
+	    c = fgetc(fptr);
+	    while (c != EOF)
+	    {
+	        printf ("%c", c);
+	        c = fgetc(fptr);
+	    }
+	    fclose(fptr);
+    */
 	return 1;
 }
 int main()
