@@ -218,7 +218,7 @@ void STP()
 */
 int getOpcode(int instruction[3]) 
 {
-	int compare;
+	//int compare;
 
 	int opCodes[8][3] = 
 	{
@@ -254,7 +254,7 @@ int getOpcode(int instruction[3])
 	@param instruction - This the the instruction code the user has gained from the file
 	@param line - This code is the line that the code is to affect, this varies depending, it is converted from binary and passed on.
 */
-void execute(int instruction[3], int line[5])
+void execute(int instruction[3])
 {
 
 	int opCode = getOpcode(instruction);
