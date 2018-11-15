@@ -147,32 +147,52 @@ int *decimalToBinary(int size, int numToConvert)
 	return flippedBinary;
 }
 
-
+/*
+	This method adds the content of the CI and sets it to the store
+*/
 void JMP()
 {
 	printf("JMP");
 	CI = Store;
 }
+/*
+	This adds the content of the store location to the CI
+*/
 void JRP()
 {
 	printf("JRP");
 }
+/*
+	This gives the negative alternative of the content in the store and loads that in
+*/
 void LDN()
 {
 	printf("LDN");
 }
+/*
+	This adds the contents of the Accumulator to the store
+*/
 void STO()
 {
 	printf("STO");
 }
+/*
+	This subtracts the contents of the accumulator
+*/
 void SUB()
 {
 	printf("SUB");
 }
+/*
+	if the accumulator has negative values then incriment, if it doesnt, then do nothing
+*/
 void CMP()
 {
 	printf("CMP");
 }
+/*
+	This stops the proccess
+*/
 void STP()
 {
 	printf("stopping");
