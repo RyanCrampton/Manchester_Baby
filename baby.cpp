@@ -21,7 +21,7 @@ public:
     //set ACCUMULATOR to be 0 for default
     ACCUMULATOR = "00000000000000000000000000000000";
     //set CI to point to the default line 0
-    CI = "00000";
+    CI = "00000000000000000000000000000000";
     //set current line to contain nothing at default
     PI = "00000000000000000000000000000000";
     debug = false;
@@ -115,12 +115,12 @@ public:
   	string opCodes[8] =
   	{
   		{"000"},
-  		{"001"},
-  		{"010"},
-  		{"011"},
   		{"100"},
-  		{"101"},
+  		{"010"},
   		{"110"},
+  		{"001"},
+  		{"101"},
+  		{"011"},
   		{"111"},
   	};
 
@@ -162,9 +162,7 @@ public:
 
   void fetch() {
 
-    int lineNumber = binaryToDecimal(5, CI);
-
-    this->PI.clear();
+    int lineNumber = binaryToDecimal(32, CI);
 
     this->PI = this->STORE.at(lineNumber);
   }
@@ -183,11 +181,24 @@ public:
     return PI.substr(13, 3);
   }
 
+  int getNumAtIndex(int index) {
+
+    string line = this->STORE.at(index);
+
+    line = line.substr(0, line.length()/2);
+
+    return binaryToDecimal(16, line);
+  }
+
     void JMP(string operand)
     {
       printf("JMP \n");
 
-      //this->CI = operand;
+      int num = binaryToDecimal(5, operand);
+
+      num = getNumAtIndex(num);
+
+      this->CI = decimalToBinary(5, num);
     }
 
     /*
@@ -195,52 +206,84 @@ public:
     */
     void JRP(string operand)
     {
-    	printf("JRP \n");
-
+      printf("JRP \n");
       int location1, location2, result;
 
-      //location1 = binaryToDecimal(5, operand);
-      //location2 = binaryToDecimal(5, this->CI);
+      location1 = binaryToDecimal(5, operand);
+      location1 = getNumAtIndex(location1);
+      location2 = binaryToDecimal(32, this->CI);
+      location2 = getNumAtIndex(location2);
 
-      //result = location1 + location2;
+      result = location1 + location2;
 
-      //this->CI = decimalToBinary(5, result);
+      this->CI = decimalToBinary(5, result);
 
     }
     /*
     	This gives the negative alternative of the content in the store and loads that in
     */
-    void LDN()
+    void LDN(string operand)
     {
-    	printf("LDN \n");
+      printf("LDN \n");
+    	int num = binaryToDecimal(5, operand);
+
+      num = getNumAtIndex(num);
+
+      //printf("%d\n", num);
+
+      ACCUMULATOR = decimalToBinary(32, num * -1);
+
+      //std::cout << ACCUMULATOR << '\n';
     }
     /*
     	This adds the contents of the Accumulator to the store
     */
-    void STO()
+    void STO(string operand)
     {
-    	printf("STO \n");
+
+      //cout << operand << '\n';
+
+      printf("STO \n");
+      int num = binaryToDecimal(5, operand);
+
+      //cout << num << '\n';
+
+      this->STORE.at(num) = ACCUMULATOR;
     }
     /*
     	This subtracts the contents of the accumulator
     */
-    void SUB()
+    void SUB(string operand)
     {
-    	printf("SUB \n");
+      printf("SUB \n");
+      int num = binaryToDecimal(5, operand);
+      int num2 = binaryToDecimal(32, ACCUMULATOR);
+
+      num = getNumAtIndex(num);
+
+      ACCUMULATOR = decimalToBinary(32, num2 - num);
+
     }
     /*
     	if the accumulator has negative values then incriment, if it doesnt, then do nothing
     */
-    void CMP()
+    void CMP(string operand)
     {
     	printf("CMP \n");
+
+      if (binaryToDecimal(32, ACCUMULATOR) < 0) {
+        incriment();
+      }
     }
     /*
     	This stops the proccess
     */
-    void STP()
+    void STP(string operand)
     {
     	printf("stopping \n");
+
+      std::cout << ACCUMULATOR << '\n';
+      std::cout << binaryToDecimal(32, ACCUMULATOR) << '\n';
     }
 
 
@@ -268,27 +311,27 @@ public:
   	}
   	else if(opCode == LDNCODE)
   	{
-  		LDN();
+  		LDN(operand);
   	}
   	else if(opCode == STOCODE)
   	{
-  		STO();
+  		STO(operand);
   	}
   	else if(opCode == SUBCODE)
   	{
-  		SUB();
+  		SUB(operand);
   	}
   	else if(opCode == SUB2CODE)
   	{
-  		SUB();
+  		SUB(operand);
   	}
   	else if(opCode == CMPCODE)
   	{
-  		CMP();
+  		CMP(operand);
   	}
   	else if(opCode == STPCODE)
   	{
-  		STP();
+      STP(operand);
       return -1;
   	}
     return 0;
@@ -301,17 +344,34 @@ public:
   @arrayToConvert - The arrayToConvert argument is the array to be converted to a Integer
   @return - returns the respective integer that is the result of the arrayToConvert
   */
-  size_t binaryToDecimal(int size, string arrayToConvert) {
+  int binaryToDecimal(int size, string arrayToConvert) {
 
      int i;
      int decimal = 0, bit = 1;
+     bool negative = false;
 
      reverse(arrayToConvert.begin(), arrayToConvert.end());
+
+     if (arrayToConvert.at(0) == '1') {
+       negative = true;
+
+      for (size_t i = 0; i < arrayToConvert.length(); i++) {
+        if (arrayToConvert.at(i) == '1') {
+          arrayToConvert.at(i) = '0';
+        } else {
+          arrayToConvert.at(i) = '1';
+        }
+      }
+     }
 
      for (i = size - 1; i >= 0; i--) {
 
          decimal += (arrayToConvert[i] - '0')*bit;
          bit *= 2;
+     }
+     if (negative) {
+       ++decimal;
+       return decimal * -1;
      }
 
   	 return decimal;
