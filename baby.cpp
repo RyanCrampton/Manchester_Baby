@@ -320,7 +320,7 @@ public:
       int num = binaryToDecimal(addressSize, operand);
       num = getNumAtIndex(num);
       //set the CI to be the value found in the store
-      this->CI = decimalToBinary(addressSize, num);
+      this->CI = decimalToBinary(memSize, num);
 
       if (debug) {
         cout << "To: " << CI << '\n';
@@ -351,11 +351,11 @@ public:
       //add store value to CI
       result = location1 + location2;
 
-      this->CI = decimalToBinary(addressSize, result);
+      this->CI = decimalToBinary(memSize, result);
 
       if (debug) {
         cout << "To: " << CI << '\n';
-        cout << "Which is an increase of " << location2 <<'\n';
+        cout << "Which is an increase of " << location1 - location2 <<'\n';
       }
     }
     /*
@@ -434,7 +434,6 @@ public:
       if (debug) {
         cout << "The resulting number is: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
       }
-
     }
     /*
     	if the accumulator has negative values then incriment, if it doesnt, then do nothing
@@ -443,7 +442,7 @@ public:
     void CMP(string operand)
     {
     	if (debug) {
-        cout << " which will cause the CMP" << '\n';
+        cout << " which will cause us to call the CMP" << '\n';
       }
       if (binaryToDecimal(memSize, ACCUMULATOR) < 0) {
         if (debug) {
@@ -631,7 +630,6 @@ public:
 
     this->displayInfo();
 
-    return 1;
   }
 };
 
@@ -693,4 +691,10 @@ void menu() {
       }
     }
   }
+}
+
+
+int main(int argc, char const *argv[]) {
+  menu();
+  return 0;
 }
