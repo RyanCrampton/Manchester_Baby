@@ -656,8 +656,8 @@ Basic menu, starts the manchester baby and does some setting up preparations
 void babyMenu() {
 
   bool running = true;
-  cout << "Welcome to the Manchester Baby Program!" << '\n';
-  cout << "Please Select an option from the list below:" << '\n';
+  cout << "\n\nWelcome to the Manchester Baby Program!\n" << '\n';
+
   Baby *currentBaby = new Baby();
 
   cout << "Please load an Initial file \n" << '\n';
@@ -667,6 +667,7 @@ void babyMenu() {
   }
 
   while (running) {
+      cout << "\nPlease Select an option from the list below:\n" << '\n';
 
     cout << "Enter 1 to load in a new file" << '\n';
     cout << "Enter 2 to enable/disable debug mode" << '\n';

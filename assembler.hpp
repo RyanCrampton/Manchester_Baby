@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 using namespace std;
 
@@ -37,9 +38,9 @@ class babyAssembler
 		{"CMP","011"},
 		{"STP","111"},
 	};
-	
+
 public:
-	
+
 	babyAssembler();
 	~babyAssembler();
 	int openAndReadFile();
@@ -67,21 +68,21 @@ babyAssembler::babyAssembler()
 //Destructor
 babyAssembler::~babyAssembler()
 {
-	
+
 }
 
 //Get the name of the file translate
 void babyAssembler::getFileName()
 {
 	string fileName;
-	
+
 	//Make sure there is something in it
 	while(fileName.empty())
 	{
 		cout << "Please input the name of the assembly file you wish to convert including the .txt" << endl;
 		cin >> fileName;
 	}
-	
+
 	//Once satisfied read it in
 	this->fileName = fileName;
 }
@@ -95,9 +96,9 @@ int babyAssembler::openAndReadFile()
 		cout << "Could not open file" << endl;
 		return 1;
 	}
-	
+
 	string line;
-	
+
 	while(getline(in, line))
 	{
 		string label = line.substr(0, 5);
@@ -108,7 +109,7 @@ int babyAssembler::openAndReadFile()
 		string operand = line.substr(14, 5);
 		operand.erase(remove(operand.begin(),operand.end(), ' ' ), operand.end() );
 		string comment = ";";
-		
+
 		if (line.find(";") == 0)
 		{
 			//cout << "Lines contains a comment at the start" << endl;
@@ -116,19 +117,19 @@ int babyAssembler::openAndReadFile()
 		else
 		{
 			//cout << "Label: " << label << " Instruction: " << instruction << " Operand: " << operand << endl;
-			
+
 			if(!label.empty())
 			{
 				addToLookUpTable(label);
 			}
 		}
-		
-		
+
+
 	}
-	
+
 	return 0;
-	
-	
+
+
 }
 
 /*
@@ -144,7 +145,7 @@ string babyAssembler::decToBinary(string decimal)
 	string binaryNumber = "";
 	string flipbits= "00000000000000000000000000000000";
 	int counter =0;
-	
+
 	do
 	{
 		if(decimalNumber >= powerOf2)
@@ -156,19 +157,19 @@ string babyAssembler::decToBinary(string decimal)
 		{
 			binaryNumber = binaryNumber+"0";
 		}
-		
+
 		if(decimalNumber!=0)
 		{
 			powerOf2 = powerOf2/2;
 		}
-		
+
 		counter++;
 	}while(counter!=32);
-	
+
 	for(int i = 0; i < 32; i++)	{
 		flipbits.at(i) = binaryNumber.at(31-i);
 	}
-	
+
 	return flipbits;
 }
 
@@ -177,7 +178,7 @@ string babyAssembler::searchSymbolTable(string name)
 {
 	bool found = false;
 	int counter = 0;
-	
+
 	//While its not found and we are not at the end of the symbol table
 	while(found == false && counter < 8)
 	{
@@ -190,7 +191,7 @@ string babyAssembler::searchSymbolTable(string name)
 		//Otherwise next row
 		counter++;
 	}
-	
+
 	//If not found return could not find
 	return "CNF";
 }
@@ -200,7 +201,7 @@ void babyAssembler::addToLookUpTable(string label)
 {
 	vector<string> tmp;
 	tmp.push_back(label);
-	
+
 	//Add to lookup table
 	lookupTable.push_back(tmp);
 }
@@ -211,10 +212,10 @@ void babyAssembler::addToLookUpTable(string label, string address)
 	vector<string> tmp;
 	tmp.push_back(label);
 	tmp.push_back(address);
-	
+
 	//Add to lookup
 	lookupTable.push_back(tmp);
-	
+
 }
 
 //Method for debug print out look up
@@ -245,7 +246,7 @@ string babyAssembler::searchLookupTable(string label)
 {
 	bool found = false;
 	int counter = 0;
-	
+
 	//While not found and we are not at the end of the lookup table
 	while(found == false && counter < lookupTable.size())
 	{
@@ -255,11 +256,11 @@ string babyAssembler::searchLookupTable(string label)
 			//Return the address
 			return lookupTable[counter][0];
 		}
-		
+
 		//Increment the counter
 		counter++;
 	}
-	
+
 	//If not found return NULL
 	return NULL;
 }
@@ -269,7 +270,7 @@ string babyAssembler::getAddress(string label)
 {
 	bool found = false;
 	int counter = 0;
-	
+
 	//While not found and we are not at the end of the table
 	while(found == false && counter < lookupTable.size())
 	{
@@ -284,11 +285,11 @@ string babyAssembler::getAddress(string label)
 			//Return address
 			return lookupTable[counter][1];
 		}
-		
+
 		//Increment counter
 		counter++;
 	}
-	
+
 	//Could not find it
 	return "CNF";
 }
@@ -301,7 +302,7 @@ bool babyAssembler::addAddress(string label, string address)
 	{
 		int counter = 0;
 		bool added = false;
-		
+
 		//While its not added and we are not at the end of the table
 		while(added == false && counter < lookupTable.size())
 		{
@@ -312,19 +313,19 @@ bool babyAssembler::addAddress(string label, string address)
 				vector<string> tmp;
 				tmp.push_back(label);
 				tmp.push_back(address);
-				
+
 				lookupTable.erase(lookupTable.begin() + counter);
-				
+
 				lookupTable.push_back(tmp);
 				added = true;
-				
+
 				return true;
 			}
-			
+
 			//Increment counter
 			counter++;
 		}
-		
+
 		//Not added
 		return false;
 	}
@@ -345,10 +346,10 @@ void babyAssembler::firstPass()
 	{
 		cout << "Could not open file" << endl;
 	}
-	
+
 	int lineNum = 1;
 	string line;
-	
+
 	//While it still has lines in it
 	while(getline(in, line))
 	{
@@ -362,7 +363,7 @@ void babyAssembler::firstPass()
 		string operand = line.substr(14, 5);
 		operand.erase(remove(operand.begin(),operand.end(), ' ' ), operand.end() );
 		string comment = ";";
-		
+
 		//Find comments
 		if (line.find(";") == 0)
 		{
@@ -371,7 +372,7 @@ void babyAssembler::firstPass()
 		else
 		{
 			//cout << "Label: " << label << " Instruction: " << instruction << " Operand: " << operand << endl;
-			
+
 			//Add labels
 			if(!label.empty())
 			{
@@ -379,17 +380,17 @@ void babyAssembler::firstPass()
 			}
 			//Places           0123456789*123456789*123456789*1
 			string currLine = "00000000000000000000000000000000";
-			
+
 			//Add instructions
 			if(instruction == "VAR")
 			{
-					
+
 			}
 			else
 			{
 				currLine.replace(13,3, searchSymbolTable(instruction));
 			}
-			
+
 			if(!label.empty() && searchLookupTable(label) == label && instruction == "VAR")
 			{
 				string binNum = decToBinary(operand);
@@ -397,7 +398,7 @@ void babyAssembler::firstPass()
 				addAddress(label, address);
 				currLine = binNum;
 			}
-			
+
 			if(!label.empty() && searchLookupTable(label) == label && instruction == "STP")
 			{
 				string sLineNum = to_string(lineNum);
@@ -406,7 +407,7 @@ void babyAssembler::firstPass()
 				addAddress(label, sLineNum);
 				currLine = binNum;
 			}
-			
+
 			if(!label.empty() && searchLookupTable(label) == label && label == "START")
 			{
 				string sLineNum = to_string(0);
@@ -415,7 +416,7 @@ void babyAssembler::firstPass()
 				addAddress(label, sLineNum);
 				currLine = binNum;
 			}
-			
+
 			lineNum++;
 			outputBuffer.push_back(currLine);
 		}
@@ -429,18 +430,18 @@ void babyAssembler::secondPass()
 	string currentLine;
 	int counter = 0;
 	currentLine = outputBuffer[counter];
-	
+
 	//Open file
 	ifstream in (fileName);
-	
+
 	//Cant open file
 	if(!in)
 	{
 		cout << "Could not open file" << endl;
 	}
-	
+
 	string line;
-	
+
 	//Still lines in the file
 	while(getline(in, line))
 	{
@@ -451,7 +452,7 @@ void babyAssembler::secondPass()
 		}
 		else if (line.find("VAR") == 0) //Find variables
 		{
-			
+
 		}
 		else
 		{
@@ -464,10 +465,10 @@ void babyAssembler::secondPass()
 			string operand = line.substr(14, 5);
 			operand.erase(remove(operand.begin(),operand.end(), ' ' ), operand.end() );
 			string comment = ";";
-			
+
 			string address;
 			address = getAddress(operand);
-			
+
 			//Variable label
 			if(label != "START" && label != "END")
 			{
@@ -478,67 +479,67 @@ void babyAssembler::secondPass()
 					sAddress--;
 					address = to_string(sAddress);
 					string binNum = decToBinary(address);
-					
+
 					binNum.replace(13, 3, searchSymbolTable(instruction));
-					
+
 					outputBuffer.erase(outputBuffer.begin() + counter);
 					outputBuffer.insert(outputBuffer.begin() + counter, binNum);
 				}
-				
+
 				counter ++;
 			}
-			
+
 			//Start label
 			if(label == "START")
 			{
 				string address;
 				address = getAddress("END");
-				
+
 				if(address != "CNF")
 				{
 					//Redo the line add binary and instructions add to buffer
 					int decimalNumber = stoi(address);
 					//bdecimalNumber--;
 					string sAddress = to_string(decimalNumber);
-					
+
 					string binNum = decToBinary(address);
-					
+
 					binNum.replace(13, 3, searchSymbolTable(instruction));
 					outputBuffer.erase(outputBuffer.begin() + counter);
 					outputBuffer.insert(outputBuffer.begin() + (counter), binNum);
 
 				}
-				
+
 				counter ++;
 			}
-			
+
 			//End label
 			if(label == "END")
 			{
 				string address;
 				address = getAddress("START");
-				
+
 				if(address != "CNF")
 				{
 					//Redo the line add binary and instructions add to buffer
 					int decimalNumber = stoi(address);
 					//bdecimalNumber--;
 					string sAddress = to_string(decimalNumber);
-					
+
 					string binNum = decToBinary(sAddress);
-					
+
 					binNum.replace(13, 3, searchSymbolTable(instruction));
 					//outputBuffer.erase(outputBuffer.begin() + (counter-1));
 					outputBuffer.erase(outputBuffer.begin() + counter);
 					outputBuffer.insert(outputBuffer.begin() + (counter), binNum);
-					
+
 				}
-				
+
 				counter ++;
 			}
-			
+
 		}
-		
+
 	}
 }
 
@@ -547,7 +548,7 @@ void babyAssembler::writeToFile()
 {
 	//Open and make the file
 	ofstream output_file("./babyBinary.txt");
-	
+
 	//All elements in the buffer
 	for (const auto &e : outputBuffer)
 	{
