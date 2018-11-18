@@ -712,8 +712,3 @@ void babyMenu() {
     }
   }
 }
-
-int main(int argc, char const *argv[]) {
-  babyMenu();
-  return 0;
-}
