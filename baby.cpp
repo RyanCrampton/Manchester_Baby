@@ -637,6 +637,16 @@ public:
 
     this->displayInfo();
 
+    //reset all the values to default
+
+    //set ACCUMULATOR to be 0 for default
+    ACCUMULATOR = "00000000000000000000000000000000";
+    //set CI to point to the default line 0
+    CI = "00000000000000000000000000000000";
+    //set current line to contain debugger at default
+    PI = "00000000000000000000000000000000";
+    //turn off debug mode
+    debug = false;
   }
 };
 
@@ -689,7 +699,11 @@ void babyMenu() {
           currentBaby->flipDebugSwitch();
           break;
         case 3:
+        if (currentBaby->getLoadStatus()) {
           currentBaby->runBaby();
+        } else {
+          std::cout << "No file loaded into store!" << '\n';
+        }
           break;
         default:
           cout << "Number not within range" << '\n';
@@ -697,4 +711,9 @@ void babyMenu() {
       }
     }
   }
+}
+
+int main(int argc, char const *argv[]) {
+  babyMenu();
+  return 0;
 }
