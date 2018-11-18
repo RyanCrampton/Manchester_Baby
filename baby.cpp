@@ -9,12 +9,32 @@ enum Operands {JMPCODE, JRPCODE, LDNCODE, STOCODE, SUBCODE, SUB2CODE, CMPCODE, S
 
 class Baby {
 private:
+  //vector acts a simulation of the stor
   vector<string> STORE;
+  //ACCUMULATOR holds numbers for arithmatic
   string ACCUMULATOR;
-  //set CI to point to the default line 0
+  //set CI to point the addresses in the store
   string CI;
+  //PI to hold the current instruction being run
   string PI;
-  bool debug;
+  //memory size
+  int memSize;
+  //size used for operands
+  int addressSize;
+  //used for error checking
+  bool debug, fileLoaded;
+
+  //displays all values, used while the baby is running
+  void displayInfo() {
+
+    if (debug) {
+      cout << "\nCI: " << CI << '\n';
+      cout << "PI: " << PI << '\n';
+    }
+
+    cout << "\nAccumulator: " << ACCUMULATOR <<'\n';
+    cout << "Accumulator decimal value: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n' << '\n';
+  }
 
 public:
   Baby () { //default constructor
@@ -22,31 +42,68 @@ public:
     ACCUMULATOR = "00000000000000000000000000000000";
     //set CI to point to the default line 0
     CI = "00000000000000000000000000000000";
-    //set current line to contain nothing at default
+    //set current line to contain debugger at default
     PI = "00000000000000000000000000000000";
+    //turn off debug mode
     debug = false;
-
+    //default memory size is 32
+    memSize = 32;
+    //default address size is 5
+    addressSize = 5;
+    //file has not been loaded yet
+    fileLoaded = false;
   }
-  //Baby (arguments);
-  virtual ~Baby () {}
+  //Clears out the STORE
+  virtual ~Baby () {
+    this->STORE.clear();
+  }
 
+  //loads in teh store from a file
   void setStore() {
+    this->fileLoaded = false;
     this->STORE = loadFile();
-
   }
 
+  //return whether or not a file has been loaded
+  bool getLoadStatus() { return fileLoaded; }
 
+  //Changes debug mode on/off
+  void flipDebugSwitch() {
+
+    if (debug) {
+      cout << "Debug disabled" << '\n';
+      this->debug = false;
+    } else {
+      cout << "Debug enabled" << '\n';
+      this->debug = true;
+    }
+  }
+
+  /*
+  This method will prompt the user for a filename, then attempt to extract the data
+  from that file.
+  @return Function returns the loaded file, and returns and empty file with appropriate
+  error message upon fail
+  */
   vector<string> loadFile()
   {
-    	//open the file in read mode
+
+    std::cout << "Please enter a fileName: " << '\n';
+
+    string fileName;
+
+    cin >> fileName;
+
+    //open the file in read mode
   	FILE *pFile;
-  	pFile = fopen("Binary.txt", "r");
+  	pFile = fopen(fileName.c_str(), "r");
 
     vector<string> binaries;
 
-  	//free(buffer);
+      //if file doesn't exist
     	if (pFile == NULL)
     	{
+        std::cerr << "EER: File " << fileName << " Not found!" <<'\n';
         //return and empty vector
   		return binaries;
   	}
@@ -55,9 +112,21 @@ public:
   	size_t i, c;
   	char data;
   	i = c = 0;
-  	//Determine how big the Array is going to be for memory allocation purposes
+
+  	//Determine how big the Array is going to be to make sure it doesn't go outwith boundaries
   	while ((data = fgetc(pFile)) != EOF)
   	{
+      //compaability for windows
+      if (data == '\r') {
+        continue;
+      }
+
+      //if data does not consists solely of 1's 0's or newlines
+      if (data != '0' && data != '1' && data != '\n') {
+        cerr << "UNKOWN CHARACTER IN FILE: " << (int) data << '\n';
+        return binaries;
+      }
+
       	if (data != '\n') {
         	i++;
   	    }
@@ -66,12 +135,14 @@ public:
   	    	c++;
   	    }
     	}
+    //calcuate number of rows
   	int rows = c;
   	//don't need to cast to a float as this will always be a whole number
   	int columns = i/c;
 
-    if (columns > 33 || rows > 33) {
-      cerr << "ERR: File is bigger than 32x32" << '\n';
+    //if the file is larger than the baby is designed to handle
+    if (columns > memSize || rows > memSize) {
+      cerr << "ERR: File is bigger than defined memory limit: " << memSize << '\n';
       return binaries;
     }
 
@@ -80,6 +151,7 @@ public:
     	rewind(pFile);
       string currentLine;
 
+      //cycle through file again, this time adding it to vector
     	while ((data = fgetc(pFile)) != EOF)
     	{
 
@@ -97,7 +169,11 @@ public:
       	}
     }
 
+    //close file
     fclose(pFile);
+    //change boolean as there is now data in store
+    this->fileLoaded = true;
+    //return vector
     return binaries;
   }
 
@@ -124,166 +200,269 @@ public:
   		{"111"},
   	};
 
+    if (debug) {
+      cout << "The opcode in the present instruction is: " << instruction;
+    }
+
   	for (int i = 0; i < 8; i++) {
 
   		if (instruction.compare(opCodes[i]) == 0) {
-        //cout << "Opcode: " << opCodes[i] << " Matches " << instruction << " at :" << i << '\n';
   			return i;
   		}
   	}
   	return -1;
-
   }
 
   /*
-  	This method increments the global binary array CI by a single digit, it uses a basic for
-  	loop to check which values are 0s or 1s
+  	This method increments the global binary array CI by a single digit, It uses a do while
+    loop to add a single bit
   */
   void incriment()
   {
+
+
+    if (debug) {
+      cout << "Incrementing the current CI value by one" << '\n';
+      cout << "our current CI is " << CI << '\n';
+      cout << "Or as a decimal: " << this->binaryToDecimal(memSize, CI) << '\n';
+    }
+
    	int i = 0;
 
+    //if the first bit is a 1
   	if (CI.at(i) == '1') {
   		do {
+        //change the bit to 0
   			CI[i] = '0';
 
+        //until we hit another 0
   		} while(CI[++i] != '0');
 
+      //then change that 0 to a 1
   		CI[i] = '1';
 
   	} else {
+      //else if the first bit is a 0, change it to a 1
   		CI[i] = '1';
   	}
 
-
-    //cout << "CURRENT INSTRICTION : " << CI << " NUMBER: " << binaryToDecimal(5, CI) << '\n';
-
+    if (debug) {
+      cout << "Now the CI has been incremented to: " << CI << '\n';
+      cout << "Or as a decimal: " << this->binaryToDecimal(memSize, CI) << '\n';
+    }
   }
 
+  /*
+  This function simulates the fetch in the fetch execute cycle, by setting PI to
+  the index in the STORE.
+  */
   void fetch() {
 
-    int lineNumber = binaryToDecimal(32, CI);
+    if (debug) {
+      cout << "Fetching the next insctrution, the previous instruction was: " << PI << '\n';
+    }
 
+    //calculate where CI is pointing to
+    int lineNumber = binaryToDecimal(memSize, CI);
+    //And set PI to hold it
     this->PI = this->STORE.at(lineNumber);
+
+    if (debug) {
+      cout << "The New instruction is: " << PI << '\n';
+    }
   }
 
 
   /*
-  	This method pulls the relevant information from the lines of code, this pulls all of the needed info from the already established CI.
-  	@param operand - This is the method that works with the location itself
-  	@param instruction- This is the passed varible that holds the location that the command needs to go and also the command itself, this copies from the array
+  Returns the operand from the PI by tacking out the first 5 values
   */
   string decodeOperand () {
-    return PI.substr(0, 5);
+    return PI.substr(0, addressSize);
   }
 
+  /*
+  Returns the opCode from the PI by tacking out values between 13 and 16
+  */
   string decodeOpcode() {
     return PI.substr(13, 3);
   }
 
+  /*
+  This function takes in a index and finds the number that the index points to,
+  which is in the storage for numbers at the end of STORE
+  @param index - the index in the store that our number is held
+  @return - returns the number in decimal form
+  */
   int getNumAtIndex(int index) {
 
     string line = this->STORE.at(index);
 
+    //take the number from the firts half of the line
     line = line.substr(0, line.length()/2);
 
     return binaryToDecimal(16, line);
   }
 
+    /*
+    This function takes in the adress of an operand, then sets the CI to jusmp to
+    that address
+    @param operand - address to be jumped to
+    */
     void JMP(string operand)
     {
-      printf("JMP \n");
 
-      int num = binaryToDecimal(5, operand);
+      if (debug) {
+        cout << " which will cause us to call the JMP Instruction" << '\n';
+        cout << "After calling JMP, we have Jumped the CI from: " << CI << '\n';
+      }
 
+      //change the number to a decimal, so we can find the value in the store
+      int num = binaryToDecimal(addressSize, operand);
       num = getNumAtIndex(num);
+      //set the CI to be the value found in the store
+      this->CI = decimalToBinary(addressSize, num);
 
-      this->CI = decimalToBinary(5, num);
+      if (debug) {
+        cout << "To: " << CI << '\n';
+      }
     }
 
     /*
-    	This adds the content of the store location to the CI
+    	This function will take in an operand and then find the value that the operand
+      points to and will add its value to the CI's value
+
+      @param operand - The address of the number in the store
     */
     void JRP(string operand)
     {
-      printf("JRP \n");
+      if (debug) {
+        cout << " which will cause us to call the JRP Instruction" << '\n';
+        cout << "After calling JRP, we have Jumped the CI from: " << CI << '\n';
+      }
+
       int location1, location2, result;
 
-      location1 = binaryToDecimal(5, operand);
+      //get value of location1 from store
+      location1 = binaryToDecimal(addressSize, operand);
       location1 = getNumAtIndex(location1);
-      location2 = binaryToDecimal(32, this->CI);
-      location2 = getNumAtIndex(location2);
 
+      location2 = binaryToDecimal(memSize, this->CI);
+
+      //add store value to CI
       result = location1 + location2;
 
-      this->CI = decimalToBinary(5, result);
+      this->CI = decimalToBinary(addressSize, result);
 
+      if (debug) {
+        cout << "To: " << CI << '\n';
+        cout << "Which is an increase of " << location2 <<'\n';
+      }
     }
     /*
-    	This gives the negative alternative of the content in the store and loads that in
+    	This function takes in an operand and sets the ACCUMULATOR to hold the negative
+      of what the operand points to in te store
+
+      @param operand - The address of the number in the store
     */
     void LDN(string operand)
     {
-      printf("LDN \n");
-    	int num = binaryToDecimal(5, operand);
 
+      if (debug) {
+        cout << " which will cause us to call the LDN Instruction" << '\n';
+        cout << "After calling LDN, we have changed the ACCUMULATOR from: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
+      }
+
+      //retreive the value from the store
+    	int num = binaryToDecimal(addressSize, operand);
       num = getNumAtIndex(num);
 
-      //printf("%d\n", num);
+      //set the ACCUMULATOR to be the negative value aken from the store
+      ACCUMULATOR = decimalToBinary(memSize, num * -1);
 
-      ACCUMULATOR = decimalToBinary(32, num * -1);
-
-      //std::cout << ACCUMULATOR << '\n';
+      if (debug) {
+        cout << "To : " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
+      }
     }
     /*
-    	This adds the contents of the Accumulator to the store
+    	This function takes in an operand which points to where a number can be stored,
+      then sets the contents of accumulator to be stored in that location
+
+      @param operand - The address of the number in the store
     */
     void STO(string operand)
     {
 
-      //cout << operand << '\n';
+      if (debug) {
+        cout << " which will cause us to call the STO Instruction" << '\n';
+        cout << "After calling STO, we will be storing the value: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
+      }
 
-      printf("STO \n");
-      int num = binaryToDecimal(5, operand);
-
-      //cout << num << '\n';
-
+      //retreive number from store
+      int num = binaryToDecimal(addressSize, operand);
+      //set accumulator to be equal to ir
       this->STORE.at(num) = ACCUMULATOR;
+
+      if (debug) {
+        cout << "In the index : " << num << '\n';
+      }
     }
+
     /*
-    	This subtracts the contents of the accumulator
+    	This function takes in an operand which points to a number on the store, then retreives
+      that number and subtracts it from the accumulator
+
+      @param operand - The address of the number in the store
     */
     void SUB(string operand)
     {
-      printf("SUB \n");
-      int num = binaryToDecimal(5, operand);
-      int num2 = binaryToDecimal(32, ACCUMULATOR);
+
+      //get numbers to perform calculations
+      int num = binaryToDecimal(addressSize, operand);
+      int num2 = binaryToDecimal(memSize, ACCUMULATOR);
 
       num = getNumAtIndex(num);
 
-      ACCUMULATOR = decimalToBinary(32, num2 - num);
+      if (debug) {
+        cout << " which will cause us to call the SUB Instruction" << '\n';
+        cout << "After calling SUB, we will be subtracting the value: " << num << '\n';
+        cout << "From the value: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
+      }
+
+      //set accumulator to the result of the subtraction
+      ACCUMULATOR = decimalToBinary(memSize, num2 - num);
+
+      if (debug) {
+        cout << "The resulting number is: " << binaryToDecimal(memSize, ACCUMULATOR) << '\n';
+      }
 
     }
     /*
     	if the accumulator has negative values then incriment, if it doesnt, then do nothing
+      @param operand - The address of the number in the store
     */
     void CMP(string operand)
     {
-    	printf("CMP \n");
-
-      if (binaryToDecimal(32, ACCUMULATOR) < 0) {
+    	if (debug) {
+        cout << " which will cause the CMP" << '\n';
+      }
+      if (binaryToDecimal(memSize, ACCUMULATOR) < 0) {
+        if (debug) {
+          cout << "ACCUMULATOR < 0, so we shall increment CI \n" << '\n';
+        }
         incriment();
       }
     }
     /*
     	This stops the proccess
-    */
-    void STP(string operand)
-    {
-    	printf("stopping \n");
 
-      std::cout << ACCUMULATOR << '\n';
-      std::cout << binaryToDecimal(32, ACCUMULATOR) << '\n';
+      @param operand - The address of the number in the store
+    */
+    void STP()
+    {
+      if (debug) {
+        std::cout << " which will cause us to call STP" << '\n';
+      }
+    	cout << "Manchester baby Simulation reached STOP signal" << '\n';
     }
 
 
@@ -294,10 +473,6 @@ public:
   */
   int execute(string instruction, string operand)
   {
-
-    //cout << instruction << "      " << operand << '\n';
-
-    //cout << instruction << '\n';
 
   	int opCode = getOpcode(instruction);
 
@@ -331,7 +506,7 @@ public:
   	}
   	else if(opCode == STPCODE)
   	{
-      STP(operand);
+      STP();
       return -1;
   	}
     return 0;
@@ -405,42 +580,117 @@ public:
 
     return binary;
   }
-};
 
-int main(int argc, char const *argv[]) {
-  Baby *currentBaby = new Baby();
+  /*
+  The following function will run the Manchester baby simulation, if the debug mode is turned on
+  it will stop to display what the simulation is doing at each step of the cycle
+  */
+  void runBaby () {
 
-  currentBaby->setStore();
+    char debugger;
+    int result = 0;
 
-  int result = 0;
+    while (result != -1) {
 
-  while (result != -1) {
-    currentBaby->incriment();
+      if (debug) {
+        cout << "\n\nPress enter to continue or input 1 to turn off debugging" << '\n';
+        cin.get(debugger);
 
-    currentBaby->fetch();
-    result = currentBaby->execute(currentBaby->decodeOpcode(), currentBaby->decodeOperand());
-    //cout << '\n' << result << '\n';
+        if (debugger == '1') {
+          this->flipDebugSwitch();
+        }
+      }
+
+      this->incriment();
+
+      if (debug) {
+        cout << "\n\nPress enter to continue or input 1 to turn off debugging" << '\n';
+        cin.get(debugger);
+
+        if (debugger == '1') {
+          this->flipDebugSwitch();
+        }
+      }
+
+      this->fetch();
+
+      string opCode = this->decodeOpcode();
+      string operand = this->decodeOperand();
+
+      if (debug) {
+        cout << "\n\nPress enter to continue or input 1 to turn off debugging" << '\n';
+        cin.get(debugger);;
+
+        if (debugger == '1') {
+          this->flipDebugSwitch();
+        }
+      }
+      result = this->execute(opCode, operand);
 
     }
 
+    this->displayInfo();
 
-  /*
-  vector<string> testing;
+    return 1;
+  }
+};
 
-  currentBaby->setStore();
+/*
+Basic menu, starts the manchester baby and does some setting up preparations
+*/
+void menu() {
+
+  bool running = true;
+  cout << "Welcome to the Manchester Baby Program!" << '\n';
+  cout << "Please Select an option from the list below:" << '\n';
+  Baby *currentBaby = new Baby();
+
+  cout << "Please load an Initial file \n" << '\n';
+
+  while (!currentBaby->getLoadStatus()) {
+    currentBaby->setStore();
+  }
+
+  while (running) {
+
+    cout << "Enter 1 to load in a new file" << '\n';
+    cout << "Enter 2 to enable/disable debug mode" << '\n';
+    cout << "Enter 3 to run the Baby" << '\n';
+    //cout << "Enter 4 to switch to 64 bit mode" << '\n';
+    cout << "Enter 0 to quit \n" << '\n';
 
 
+    int input;
 
-  //currentBaby->execute("000"); //should ouput JMP
+    cin >> input;
 
+    if(cin.fail()) {
+      cin.clear();
+      cin.ignore();
+      cout << "Please input an Integer.";
+    } else {
 
-  int num = 7;
+      switch (input) {
+        case 0:
+          running = false;
+          cout << "Quitting Manchester baby....." << '\n';
+          break;
+        case 1:
+          do {
+            currentBaby->setStore();
+          } while(!currentBaby->getLoadStatus());
+          break;
+        case 2:
+          currentBaby->flipDebugSwitch();
+          break;
+        case 3:
+          currentBaby->runBaby();
+          break;
+        default:
+          cout << "Number not within range" << '\n';
+          break;
 
-  string binary = currentBaby->decimalToBinary(32, num);
-
-  cout << binary << '\n';
-
-  std::cout << currentBaby->binaryToDecimal(32, binary) << '\n';
-  */
-  return 0;
+      }
+    }
+  }
 }
