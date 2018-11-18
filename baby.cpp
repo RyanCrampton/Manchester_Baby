@@ -1,7 +1,14 @@
+/*
+Manchester Baby project for the Dundee University AC12008 Module - Architecture & Unix
+baby.cpp Written by Students Daniel Blackley (160007728) & Ryan Crampton (170013546)
+*/
+
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include "connecter.h"
 
 using namespace std;
 
@@ -636,7 +643,7 @@ public:
 /*
 Basic menu, starts the manchester baby and does some setting up preparations
 */
-void menu() {
+void babyMenu() {
 
   bool running = true;
   cout << "Welcome to the Manchester Baby Program!" << '\n';
@@ -687,14 +694,7 @@ void menu() {
         default:
           cout << "Number not within range" << '\n';
           break;
-
       }
     }
   }
-}
-
-
-int main(int argc, char const *argv[]) {
-  menu();
-  return 0;
 }
